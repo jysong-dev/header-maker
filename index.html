@@ -1,0 +1,372 @@
+<!DOCTYPE HTML>
+<html lang="ko">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>트위터 텍스트 헤더 만들기</title>
+	<script data-ad-client="ca-pub-3130463628529701" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+	<style>
+		@import url(https://spoqa.github.io/spoqa-han-sans/css/SpoqaHanSans-kr.css);
+		@import url(https://fonts.googleapis.com/earlyaccess/kopubbatang.css);
+		@import url('https://fonts.googleapis.com/css?family=Nanum+Myeongjo&display=swap');
+		@font-face {
+		    font-family: 'BMDOHYEON';
+		    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_one@1.0/BMDOHYEON.woff') format('woff');
+		    font-weight: normal;
+		    font-style: normal;
+		}
+		@font-face {
+		    font-family: 'BMJUA';
+		    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_one@1.0/BMJUA.woff') format('woff');
+		    font-weight: normal;
+		    font-style: normal;
+		}
+		
+		* {
+			font-family: 'Spoqa Han Sans', 'Spoqa Han Sans JP', 'Sans-serif';
+		}
+		
+		body {
+			margin: 30px;
+		}
+
+		.result {
+			-ms-user-select: none; 
+			-moz-user-select: -moz-none;
+			-khtml-user-select: none;
+			-webkit-user-select: none;
+			user-select: none;
+			//margin-left: 50px;
+			font-size: 20pt;
+			line-height : 180%;
+			background-color: #E6E6E6;
+			width: 1500px;
+			height: 500px;
+			overflow : hidden;
+			margin: 0 auto;
+			position : relative;
+		}
+		
+		p {
+			font-family: 'KoPub Batang', serif !important;
+			text-indent: 1em;
+			padding-top: 25px;
+			padding-left: 50px;
+			padding-right: 50px;
+			color: #ffffff;
+			opacity: 1;
+		}
+		
+/* 		small { */
+/* 			text-weight: light; */
+/* 			font-size: 12pt; */
+/* 			text-align : right; */
+/* 			float: right; */
+/* 		} */
+		
+		.result-border-top {
+			background-color: black; width: 1500px; height:50px;
+			opacity: 0.5;
+			
+			position: absolute;
+			left: 0;
+			top: 0;
+		}
+		
+		.result-border-bottom {
+			background-color: black; width: 1500px; height:50px;
+			opacity: 0.5;
+			
+			position: absolute;
+			left: 0;
+			bottom: 0;
+		}
+		
+		.type-center {
+			font-size: 48pt;
+			text-align : center;
+		}
+		
+		.type-center > p {
+			text-indent: 0em;
+			padding-top: 0px;
+			line-height: 500px;
+		}
+	</style>
+	<script
+	  src="https://code.jquery.com/jquery-3.6.0.js"
+	  integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
+	  crossorigin="anonymous"></script>
+	<script src="https://cdn.rawgit.com/eligrey/FileSaver.js/5ed507ef8aa53d8ecfea96d96bc7214cd2476fd2/FileSaver.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.5.0-beta4/html2canvas.js"></script>
+	<script>
+		$(function(){
+			countPageHits();
+
+		   $("#save").click(function() {
+				html2canvas($("#downloadImage"), {
+
+					onrendered: function(canvas) {
+						canvas.toBlob(function(blob) {
+							saveAs(blob, 'image.png');
+						});
+					}
+
+				});
+
+			});
+			
+			function readImage(input) {
+				if(input.files && input.files[0]) {
+					const reader = new FileReader()
+					reader.onload = e => {
+						
+						var theme = $('#theme').val();
+						
+						if (theme == 'dark') {
+							$('.result').css({
+								'background-image' : 'linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ), url(' + e.target.result + ')',
+								'background-position' : 'center',
+								'background-size' : 'cover'
+							});
+						} else if (theme == 'light') {
+							$('.result').css({
+								'background-image' : 'linear-gradient( rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.3) ), url(' + e.target.result + ')',
+								'background-position' : 'center',
+								'background-size' : 'cover'
+							});
+						}
+					}
+					reader.readAsDataURL(input.files[0])
+				}
+			}
+
+			const inputImage = document.getElementById("input-image")
+			inputImage.addEventListener("change", e => {
+				readImage(e.target)
+			})
+			
+			$('textarea').change(function() {
+
+				//줄 바꿈 문자를 기준으로 textarea 문자열을 분리
+				var text = $('textarea').val();
+				var lines = text.split("\n");
+
+				//내용을 HTML 버전으로 변경
+				var resultString  = "<p>";
+				for (var i = 0; i < lines.length; i++) {
+					
+					if (i < lines.length) {
+						resultString += lines[i] + "</p><p>";
+					}
+				}
+				
+				resultString += "</p>";
+				
+				//페이지에 출력
+				$('#downloadImage > p').remove();
+				$('#downloadImage').append(resultString);
+				
+				var font_color = $('#font-color').val();
+				$('#downloadImage > p').css({'color' : font_color});
+			});
+
+		});
+		
+		function countPageHits() {
+			$.ajax({
+                type: "GET",
+                url: 'http://ec2-3-36-220-229.ap-northeast-2.compute.amazonaws.com:8083/hits',
+                success: function(data) {
+					console.log(data);
+                }
+            }); 
+		}
+		
+		function changeBorderWeight(input) {
+			var height = Number($(input).val());
+			$('.result-border-top').css({'height': height});
+			$('.result-border-bottom').css({'height': height});
+		}
+		
+		function changeBorderVisibility(select) {
+			var option = $(select).val();
+			
+			if (option == 'top-bottom') {
+				$('.result-border-top').css({'display' : 'block'});
+				$('.result-border-bottom').css({'display' : 'block'});
+			} else  {
+				$('.result-border-top').css({'display' : 'none'});
+				$('.result-border-bottom').css({'display' : 'none'});
+			}
+		}
+		
+		function changeStyleType(select) {
+			var option = $(select).val();
+			
+			if (option == 'paragraph') {
+				$('.result').removeClass('type-center');
+			} else  {
+				$('.result').addClass('type-center');
+			}
+		}
+		
+		function changeFontFamily(select) {
+			var option = $(select).val();
+			
+			$('.result > p').attr('style', 'font-family : ' + option + '!important');
+		}
+		
+		function changeFontStyle(select) {
+			var option = $(select).val();
+			
+			$('.result > p').css({'font-style' : option  });	
+
+		}
+		
+		function changeFontWeight(select) {
+			var option = $(select).val();
+			
+			$('.result > p').css({'font-weight' : option });
+		}
+		
+		function changeFontColor(select) {
+			var option = $(select).val();
+			
+			$('.result > p').css({'color' : option });
+		}
+		
+		function changeTheme(select) {
+			var option = $(select).val();
+			var bg_url = $(".result").css("background-image").replace(/^url\(['"](.+)['"]\)/, '$1');
+			bg_url = bg_url.replace('linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),', '');
+			bg_url = bg_url.replace('linear-gradient(rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.3)),', '');
+			
+			//console.log(bg_url.replace('linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),', ''));
+			//console.log(bg_url.replace('linear-gradient(rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.3)),', ''));
+			//console.log(bg_url);
+			
+			if (option == 'light') {
+				$('.result-border-top').css({'background-color' : '#ffffff'});
+				$('.result-border-bottom').css({'background-color' : '#ffffff'});
+				$('.result').css({
+					'background-image' : 'linear-gradient(rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.3)),' + bg_url,
+					'background-position' : 'center',
+					'background-size' : 'cover'
+				});
+			} else if (option == 'dark') {
+				$('.result-border-top').css({'background-color' : '#000000'});
+				$('.result-border-bottom').css({'background-color' : '#000000'});
+				$('.result').css({
+					'background-image' : 'linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),' + bg_url,
+					'background-position' : 'center',
+					'background-size' : 'cover'
+				});
+			}
+			
+		}
+
+	</script>
+</head>
+<body>
+	<h1 class="spoka">트위터 텍스트 헤더 만들기</h1>
+	<ul>
+		<li>만든이 : <a href="https://peing.net/ko/one_of_dev" target="_blank">@one_of_dev</a> 불편한 점이나 이런 기능 있었으면 좋겠는 부분 자유롭게 얘기해 주세요! ★오류 제보 환영★</li>
+		<li>권장 브라우저 : 크롬, 웨일</li>
+		<!-- <li>현재 저장할 때 폰트가 조금 투명화되어서 저장되는 버그가 있습니다.</li> -->
+		<li>웹폰트가 추가되어 속도 저하 현상이 있습니다. 시간 되는 대로 개선할 예정입니다.</li>
+		<li>완성된 헤더 예시 (클릭 시 크게 보기 가능)
+			<div>
+				<a href="header-maker/VTlI67dH.jpg" target="_blank">
+					<img src="header-maker/VTlI67dH.jpg" style="width: 300px; height: 100px;">
+				</a>
+			</div>
+		</li>
+	</ul>
+	
+	<div class="row">
+		<label for="downloadImage">미리보기</label>
+		<div class="form-group" style="border: 1px dashed gray;">
+			<div id="downloadImage" class="result">
+				<div class="result-border-top" style="display: none;"></div>
+				<div class="result-border-bottom" style="display: none;"></div>
+			</div>
+		</div>
+		<button class="btn btn-success text-white" id="save">이미지 저장하기</button>
+	</div>
+		
+		<div class="row">
+			<div class="col-6">
+				<div class="form-group">
+					<label for="input-image">배경 이미지</label>
+					<input style="display: block;" type="file" id="input-image">
+				</div>
+
+				<div class="form-group">
+					<label>테두리</label>
+					<select class="form-control" onchange="changeBorderVisibility(this);">
+						<option value="">없음</option>
+						<option value="top-bottom">상하</option>
+					</select>
+				</div>
+				<div class="form-group">
+					<label>테두리 두께(픽셀 단위)</label>
+					<input type="number" class="form-control" onchange="changeBorderWeight(this);">
+				</div>
+				<div class="form-group">
+					<label>테마</label>
+					<select class="form-control" onchange="changeTheme(this);" id="theme">
+						<option value="dark" selected>어둡게</option>
+						<option value="light">밝게</option>
+					</select>
+				</div>
+				<div class="form-group">
+					<label>문단 스타일</label>
+					<select class="form-control" onchange="changeStyleType(this);">
+						<option value="paragraph">문단 나열형</option>
+						<option value="center">중앙 강조형</option>
+					</select>
+				</div>
+				<div class="form-group">
+					<label>폰트</label>
+					<select class="form-control" onchange="changeFontFamily(this);">
+						<option value="KoPub Batang">Kopub바탕</option>
+						<option value="Nanum Myeongjo">나눔명조</option>
+						<option value="BMDOHYEON">도현체</option>
+						<option value="BMJUA">주아체</option>
+					</select>
+				</div>
+				<div class="form-group">
+					<label>글자 스타일</label>
+					<select class="form-control" onchange="changeFontStyle(this);">
+						<option value="normal">기본</option>
+						<option value="italic">기울게</option>
+					</select>
+				</div>
+				<div class="form-group">
+					<label>글씨 굵기</label>
+					<select class="form-control" onchange="changeFontWeight(this);">
+						<option value="normal">기본</option>
+						<option value="bold">굵게</option>
+						<option value="lighter">얇게</option>
+					</select>
+				</div>
+				<div class="form-group">
+					<label>글자색</label>
+					<select class="form-control" onchange="changeFontColor(this);" id="font-color">
+						<option value="#ffffff" selected>화이트</option>
+						<option value="#000000">블랙</option>
+					</select>
+				</div>
+			</div>
+			<div class="col-6">
+				<div class="form-group">
+					<label for="input-text">문구</label>
+					<textarea id="input-text" class="form-control" rows="10"></textarea>
+				</div>
+			</div>
+		</div>
+
+</body>
+</html>
